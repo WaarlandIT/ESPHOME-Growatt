@@ -19,6 +19,7 @@ Check the ESPHome.io website for how to program the ESP-01, the needed yaml file
 ## Usage
 After programming the ESP-01 add the dongle in the USB port of the inverter find the allocated IP in your wifi router. Use the Home Assistant ESPHome integration to add the dongle.
 When you check the Sensors you will see something like this:
+
 ![image](https://github.com/WaarlandIT/ESPHOME-Growatt/assets/53364386/b9e3e7b2-da70-434a-8248-19f1a68ffcde)
 
 
