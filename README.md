@@ -14,7 +14,7 @@ Because they fit nicely together it was an easy choice.
 
 ## Software
 ESPHome is the easiest way to create a Home Assistant compatible agent. 
-Check the ESPHome.io website for how to program the ESP-01, the needed yaml file is in this repository. Make sure you add the wifi details and an API key to the yaml.
+Check the ESPHome.io website for how to program the ESP-01, the needed yaml file is in this repository. Make sure you add the wifi details and an API key to the yaml, personally I use a secrets.yaml for my wifi and api details so that the integration scripts are clean.
 
 ## Usage
 After programming the ESP-01 add the dongle in the USB port of the inverter find the allocated IP in your wifi router. Use the Home Assistant ESPHome integration to add the dongle.
