@@ -1,0 +1,434 @@
+esphome:
+  name: growatt-esphome
+  
+substitutions:
+  devicename: Growatt
+
+esp8266:
+  board: esp01_1m
+
+# Disable logging on Serial port
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Growatt-Esphome Fallback Hotspot"
+    password: "12345678"
+
+captive_portal:
+    
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+output:
+# Blue Led
+  - id: light_bl
+    platform: gpio
+    pin: 16
+# Green Led
+  - id: light_gr
+    platform: gpio
+    pin: 0
+# Red Led
+  - id: light_rd
+    platform: gpio
+    pin: 2
+
+uart:
+  id: mod_bus
+  tx_pin: 1
+  rx_pin: 3
+  baud_rate: 115200
+  
+modbus:
+  id: modbus1
+  uart_id: mod_bus
+  
+modbus_controller:
+  - id: growatt
+# the Modbus device addr
+    address: 0x1
+    modbus_id: modbus1
+    setup_priority: -10  
+
+
+sensor:
+  - platform: uptime
+    name: "${devicename} Uptime Sensor"
+    id: uptime_sensor
+    update_interval: 60s
+    
+  - platform: modbus_controller
+    name: "${devicename} PV1 DcPower"
+    address: 5
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV1 DcVoltage"
+    address: 3
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV1 DcInputCurrent"
+    address: 4
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV2 DcPower"
+    address: 9
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+        
+  - platform: modbus_controller
+    name: "${devicename} PV2 DcVoltage"
+    address: 7
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV2 DcInputCurrent"
+    address: 8
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcFrequency"
+    address: 37
+    register_type: "read"
+    unit_of_measurement: Hz
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.01
+  
+  - platform: modbus_controller
+    name: "${devicename} AcVoltage VAC1"
+    address: 38
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+  
+  - platform: modbus_controller
+    name: "${devicename} AcOutputCurrent IAC1"
+    address: 39
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcPower PAC1"
+    address: 40
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcVoltage VAC2"
+    address: 42
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+  
+  - platform: modbus_controller
+    name: "${devicename} AcOutputCurrent IAC2"
+    address: 43
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcPower PAC2"
+    address: 44
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcVoltage VAC3"
+    address: 46
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+  
+  - platform: modbus_controller
+    name: "${devicename} AcOutputCurrent IAC3"
+    address: 47
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} AcPower PAC3"
+    address: 48
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} Total Power"
+    address: 35
+    register_type: "read"
+    unit_of_measurement: W
+    device_class: power
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} Total Energy Today"
+    address: 53
+    register_type: "read"
+    unit_of_measurement: kWh
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} Total Energy Lifetime"
+    address: 55
+    register_type: "read"
+    unit_of_measurement: kWh
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV1 Energy Today"
+    address: 59
+    register_type: "read"
+    unit_of_measurement: kWh
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV1 Energy Lifetime"
+    address: 61
+    register_type: "read"
+    unit_of_measurement: kWh
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    name: "${devicename} PV2 Energy Today"
+    address: 63
+    register_type: "read"
+    unit_of_measurement: kWh
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} PV2 Energy Lifetime"
+    address: 65
+    register_type: "read"
+    unit_of_measurement: kWh
+    state_class: total_increasing
+    device_class: energy
+    icon: mdi:flash
+    value_type: U_DWORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} Temperature"
+    address: 93
+    register_type: "read"
+    unit_of_measurement: C
+    device_class: temperature
+    icon: mdi:thermometer
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} V String 1"
+    address: 142
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} I String 1"
+    address: 143
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} V String 3"
+    address: 146
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} I String 3"
+    address: 147
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    name: "${devicename} V String 4"
+    address: 148
+    register_type: "read"
+    unit_of_measurement: V
+    device_class: voltage
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+    
+  - platform: modbus_controller
+    name: "${devicename} I String 4"
+    address: 149
+    register_type: "read"
+    unit_of_measurement: A
+    device_class: current
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
