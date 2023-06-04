@@ -22,3 +22,4 @@ When you check the Sensors you will see something like this:
 ![image](https://github.com/WaarlandIT/ESPHOME-Growatt/assets/53364386/b9e3e7b2-da70-434a-8248-19f1a68ffcde)
 
 
+I found the yaml somewhere on a forum and altered it for my usecase, not sure who the original author is. 
