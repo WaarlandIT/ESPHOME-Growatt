@@ -1,6 +1,6 @@
 esphome:
   name: growatt-esphome
-  
+
 substitutions:
   devicename: Growatt
 
@@ -22,27 +22,29 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Growatt-Esphome Fallback Hotspot"
-    password: "12345678"
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+ap:
+  ssid: "Growatt-Esphome Fallback Hotspot"
+  password: "12345678"
 
 captive_portal:
-    
+
 time:
   - platform: homeassistant
     id: homeassistant_time
 
 output:
-# Blue Led
+  # Blue Led
   - id: light_bl
     platform: gpio
     pin: 16
-# Green Led
+
+  # Green Led
   - id: light_gr
     platform: gpio
     pin: 0
-# Red Led
+
+  # Red Led
   - id: light_rd
     platform: gpio
     pin: 2
@@ -52,25 +54,60 @@ uart:
   tx_pin: 1
   rx_pin: 3
   baud_rate: 115200
-  
+
 modbus:
   id: modbus1
   uart_id: mod_bus
-  
+
 modbus_controller:
   - id: growatt
-# the Modbus device addr
     address: 0x1
     modbus_id: modbus1
-    setup_priority: -10  
+    setup_priority: -10
 
+switch:
+  # Option 1: Hard on/off (holding register 0)
+  # Note: inverter will auto-recover to ON after power loss
+  - platform: modbus_controller
+    modbus_controller_id: growatt
+    name: "${devicename} Remote On/Off"
+    register_type: holding
+    address: 0
+    bitmask: 0x1
+    icon: mdi:power
+
+  # Option 2a: Enable/disable export limiting (holding register 122)
+  # Must be enabled before export limit power rate takes effect
+  - platform: modbus_controller
+    modbus_controller_id: growatt
+    name: "${devicename} Export Limit Enable"
+    register_type: holding
+    address: 122
+    bitmask: 0x1
+    icon: mdi:transmission-tower-off
+
+number:
+  # Option 2b: Export limit power rate (holding register 123)
+  # 0 = no export, 1000 = full export (unit is 0.1%, so 1000 = 100%)
+  # Only active when Export Limit Enable is on
+  - platform: modbus_controller
+    modbus_controller_id: growatt
+    name: "${devicename} Export Limit Power Rate"
+    register_type: holding
+    address: 123
+    value_type: S_WORD
+    min_value: -1000
+    max_value: 1000
+    step: 1
+    icon: mdi:transmission-tower
+    mode: slider
 
 sensor:
   - platform: uptime
     name: "${devicename} Uptime Sensor"
     id: uptime_sensor
     update_interval: 60s
-    
+
   - platform: modbus_controller
     name: "${devicename} PV1 DcPower"
     address: 5
@@ -81,8 +118,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV1 DcVoltage"
     address: 3
@@ -93,8 +130,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV1 DcInputCurrent"
     address: 4
@@ -105,8 +142,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV2 DcPower"
     address: 9
@@ -117,8 +154,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-        
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV2 DcVoltage"
     address: 7
@@ -129,8 +166,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV2 DcInputCurrent"
     address: 8
@@ -141,8 +178,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcFrequency"
     address: 37
@@ -150,10 +187,10 @@ sensor:
     unit_of_measurement: Hz
     icon: mdi:flash
     value_type: U_WORD
-    accuracy_decimals: 1
+    accuracy_decimals: 2
     filters:
-    - multiply: 0.01
-  
+      - multiply: 0.01
+
   - platform: modbus_controller
     name: "${devicename} AcVoltage VAC1"
     address: 38
@@ -164,8 +201,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-  
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcOutputCurrent IAC1"
     address: 39
@@ -176,8 +213,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcPower PAC1"
     address: 40
@@ -188,8 +225,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcVoltage VAC2"
     address: 42
@@ -200,8 +237,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-  
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcOutputCurrent IAC2"
     address: 43
@@ -212,8 +249,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcPower PAC2"
     address: 44
@@ -224,8 +261,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcVoltage VAC3"
     address: 46
@@ -236,8 +273,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-  
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcOutputCurrent IAC3"
     address: 47
@@ -248,8 +285,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} AcPower PAC3"
     address: 48
@@ -260,8 +297,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} Total Power"
     address: 35
@@ -272,8 +309,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} Total Energy Today"
     address: 53
@@ -284,8 +321,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} Total Energy Lifetime"
     address: 55
@@ -297,8 +334,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV1 Energy Today"
     address: 59
@@ -309,8 +346,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV1 Energy Lifetime"
     address: 61
@@ -322,7 +359,7 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
+      - multiply: 0.1
 
   - platform: modbus_controller
     name: "${devicename} PV2 Energy Today"
@@ -334,8 +371,8 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} PV2 Energy Lifetime"
     address: 65
@@ -347,20 +384,20 @@ sensor:
     value_type: U_DWORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} Temperature"
     address: 93
     register_type: "read"
-    unit_of_measurement: C
+    unit_of_measurement: "°C"
     device_class: temperature
     icon: mdi:thermometer
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} V String 1"
     address: 142
@@ -371,8 +408,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} I String 1"
     address: 143
@@ -383,8 +420,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} V String 3"
     address: 146
@@ -395,8 +432,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} I String 3"
     address: 147
@@ -407,7 +444,7 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
+      - multiply: 0.1
 
   - platform: modbus_controller
     name: "${devicename} V String 4"
@@ -419,8 +456,8 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
-    
+      - multiply: 0.1
+
   - platform: modbus_controller
     name: "${devicename} I String 4"
     address: 149
@@ -431,4 +468,4 @@ sensor:
     value_type: U_WORD
     accuracy_decimals: 1
     filters:
-    - multiply: 0.1
+      - multiply: 0.1
